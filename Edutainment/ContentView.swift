@@ -34,56 +34,91 @@ struct ContentView: View {
         
         NavigationStack {
             
-            VStack {
+            ZStack {
                 
-                VStack {
-                    Text("Multiplication factor to practice:")
-                    Stepper("Factor: \(factorNum)", value: $factorNum, in: 2...12, step: 1)
-                }
-                .padding()
+                // complete background colot
+                LinearGradient(colors: [.cyan, .yellow], startPoint: .top, endPoint:.bottom)
+                    .ignoresSafeArea()
                 
+                // main contents of app
                 VStack {
-                    Text("Number of questions:")
-                    Picker("", selection: $numQuestions) {
-                        ForEach(questionRange, id: \.self) {
-                            Text(String($0))
+                    
+                    // settings
+                    VStack {
+                        Text("Multiplication factor to practice:")
+                            .font(.title3)
+                        Stepper("Factor: \(factorNum)", value: $factorNum, in: 2...12, step: 1)
+                            .frame(maxWidth: 200)
+                        
+                        Spacer()
+                            .frame(height: 40)
+                        
+                        Text("Number of questions:")
+                            .font(.title3)
+                        Picker("", selection: $numQuestions) {
+                            ForEach(questionRange, id: \.self) {
+                                Text(String($0))
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .frame(maxWidth: 200)
                     }
-                    .pickerStyle(.segmented)
-                }
-                .padding()
-                
-                VStack {
-                    // ensures question num displayed doesn't pass numQuestions
-                    Text("Question: \(min(currentQuestion + 1, numQuestions))")
-                    Text("What is \(factorNum) x \(randNum)?")
-                    TextField("Answer", value: $inputAnswer, format: .number)
-                        .onSubmit{checkAnswer()}
-                        .alert("And your answer is ...", isPresented: $showScore){
-                            Button("Continue", action: setQuestion)
-                        } message: {
-                            Text(solutionMessage)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
+                    .background(.regularMaterial)
+                    .clipShape(.rect(cornerRadius: 20))
+                    
+                    // question, score, reset button
+                    VStack {
+                        Spacer()
+                        
+                        // min() ensures question num displayed doesn't pass numQuestions
+                        Text("Question: \(min(currentQuestion + 1, numQuestions)) of \(numQuestions)")
+                        
+                        Text("What is \(factorNum) x \(randNum)?")
+                            .font(.title2)
+                            .bold()
+                        
+                        TextField("Answer", value: $inputAnswer, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit{checkAnswer()}
+                            .frame(maxWidth: 200)
+                            .alert("And your answer is ...", isPresented: $showScore){
+                                Button("Continue", action: setQuestion)
+                            } message: {
+                                Text(solutionMessage)
+                            }
+                            .alert("Game Over", isPresented: $gameOver){
+                                Button("Play Again", action: restart)
+                            } message: {
+                                Text("Your Final Score is \(correctAnswers)/\(numQuestions)")
+                            }
+                        
+                        Spacer()
+                        
+                        Text("Current Score: \(correctAnswers) out of \(numQuestions) correct.")
+                        
+                        Button("Restart Game") {
+                            restart()
                         }
-                        .alert("Game Over", isPresented: $gameOver){
-                            Button("Play Again", action: restart)
-                        } message: {
-                            Text("Your Final Score is \(correctAnswers)/\(numQuestions)")
-                        }
-                }
-                .padding()
-                
-                VStack {
-                    Text("\(currentQuestion) out of \(numQuestions) answered.")
-                    Button("Restart Game") {
-                        restart()
+                        .padding()
+                        .tint(.white)
+                        .background(LinearGradient(colors: [.orange, .red], startPoint: .top, endPoint:.bottom))
+                        .fontWeight(.bold)
+                        .clipShape(.capsule)
+                        
                     }
-                }
+                    .padding()
+                    
+                    Spacer()
+                    
+                } // VStack that contains all of the main components
+                .navigationTitle("Edutainment")
+                .padding()
                 
-            }
-            .navigationTitle("Edutainment")
-            .padding()
+            } // ZStack for background
             
-        }
+        } // NavigationStack
         
     }
     
